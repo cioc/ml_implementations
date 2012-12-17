@@ -4,6 +4,7 @@
 import numpy
 import scipy
 import sys
+import os
 import random
 
 sys.path.append("/home/charles/dev/ml_implementations/PyTinyImage/")
@@ -41,6 +42,7 @@ max_pics = 2000
 cluster_dimension = (32,32, 3)
 means = []
 convergence = 10
+max_iterations = 5
 
 #get the samples
 samples = []
@@ -66,17 +68,32 @@ for i in range(0, cluster_count):
 	means.append(numpy.empty(cluster_dimension))
 	means[i][:] = samples[r]
 
-
 #perform k means
 print "Clustering..."
 a1 = assignclusters(means, samples)
 nc1 = newclusters(cluster_count, cluster_dimension, a1)
 d = clusterDiff(means, nc1)
+iteration_count = 1
 
-while d > convergence:
+while d > convergence and iteration_count < max_iterations :
 	print d
 	means = nc1
 	a1 = assignclusters(means, samples)
 	nc1 = newclusters(cluster_count, cluster_dimension, a1)
 	d = clusterDiff(means, nc1)
+	iteration_count += 1
 
+#finally perform our output
+output_dir = "output"
+for i in range(0, cluster_count):
+	if not os.path.isdir(output_dir+"/"+str(i)):
+		os.mkdir(output_dir+"/"+str(i))
+	cluster_data_output = open(output_dir+"/"+str(i)+"/"+str(i)+".cluster", "wb")
+	numpy.save(cluster_data_output, means[i])
+	cluster_data_output.close()
+
+for i in range(0, cluster_count * max_pics):
+	(index, img_data) = a1[i]
+	img = scipy.misc.toimage(img_data)
+	img.save(output_dir+"/"+str(index)+"/"+str(i)+".png")				
+						

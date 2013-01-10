@@ -7,7 +7,7 @@ import sys
 import os
 import random
 
-sys.path.append("/home/charles/dev/ml_implementations/PyTinyImage/")
+sys.path.append("/home/charles/ml_implementations/PyTinyImage/")
 
 import tinyimage
 
